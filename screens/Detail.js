@@ -13,21 +13,13 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Font from "expo-font";
-import { useNavigation } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as SplashScreen from "expo-splash-screen";
 import { Divider } from "react-native-paper";
 
-import AVA from "../assets/ava.jpg";
-import AVA2 from "../assets/ava2.jpg";
-import AVA3 from "../assets/ava3.jpg";
 import LOGO from "../assets/logo.png"; // Replace with your local image path
 import BACKGROUND from "../assets/bg/home.jpg"; // Replace with your background image path
-import RING from "../assets/images/rings.png";
-import MAP from "../assets/images/map-bold.png";
-import IMAGE1 from "../assets/image1.jpg"; // Replace with your first swiper image path
-import IMAGE2 from "../assets/image1.jpg"; // Replace with your second swiper image path
-import IMAGE3 from "../assets/image1.jpg"; // Replace with your third swiper image path
+
 // Prevent the splash screen from auto-hiding
 
 // SplashScreen.preventAutoHideAsync();
@@ -44,7 +36,9 @@ const { width, height } = Dimensions.get("window");
 const Detail = () => {
   const navigation = useNavigation();
   const [fontLoaded, setFontLoaded] = useState(false);
-  const [timestamp, setTimestamp] = useState(new Date().toLocaleTimeString());
+  const route = useRoute();
+
+  const { inquiry } = route.params;
 
   useEffect(() => {
     const loadFont = async () => {
@@ -54,19 +48,6 @@ const Detail = () => {
     };
     loadFont();
   }, []);
-
-  // Function to remove token
-  const doLogout = async () => {
-    // console.log('asd');
-    try {
-      await AsyncStorage.removeItem("userToken");
-      navigation.navigate("Welcome");
-      // Alert.alert('Logout', 'Token successfully removed!');
-    } catch (e) {
-      console.error("Failed to remove the token:", e);
-      Alert.alert("Logout", "Failed to remove the token.");
-    }
-  };
 
   if (!fontLoaded) {
     return null; // Return null until the font is loaded
@@ -80,42 +61,41 @@ const Detail = () => {
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.container}>
-          {/* <Text style={styles.title}>Detail</Text> */}
+          {/* Render details of the inquiry */}
           <View style={styles.formContainer}>
             <View style={styles.formCard}>
               <Text style={styles.formTitle}>Guest Inquiry Form</Text>
+
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Date :</Text>
-                <Text style={styles.input}>Thursday, 13/06/2024</Text>
+                <Text style={styles.input}>{inquiry.date}</Text>
               </View>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Hotel :</Text>
-                <Text style={styles.input}>Ashley Wahid Hasyim</Text>
+                <Text style={styles.input}>{inquiry.hotel}</Text>
               </View>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Department :</Text>
-                <Text style={styles.input}>Sales</Text>
+                <Text style={styles.input}>{inquiry.department}</Text>
               </View>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Category :</Text>
-                <Text style={styles.input}>Wedding</Text>
+                <Text style={styles.input}>{inquiry.category}</Text>
               </View>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Subject :</Text>
-                <Text style={styles.input}>
-                  Request for Customized Wedding Menu
-                </Text>
+                <Text style={styles.input}>{inquiry.subject}</Text>
               </View>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Detail :</Text>
                 <TextInput
                   style={[styles.inputArea, styles.textArea]}
-                  value="The guests are planning a wedding reception at our hotel and request a customized menu tailored to their dietary preferences. Please provide options for appetizers, main courses, and desserts, including vegetarian and gluten-free choices."
+                  value={inquiry.desc}
                   editable={false}
                   multiline
                 />
@@ -123,29 +103,30 @@ const Detail = () => {
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Guest Name :</Text>
-                <Text style={styles.input}>Rafid Ammar</Text>
+                <Text style={styles.input}>{inquiry.guestName}</Text>
               </View>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Email :</Text>
-                <Text style={styles.input}>rafid.adinegoro@gmail.com</Text>
+                <Text style={styles.input}>{inquiry.guestEmail}</Text>
               </View>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Phone Number :</Text>
-                <Text style={styles.input}>082210478147</Text>
+                <Text style={styles.input}>{inquiry.guestPhone}</Text>
               </View>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Expected Time :</Text>
-                <Text style={styles.input}>15.00 PM</Text>
+                <Text style={styles.input}>{inquiry.expectedTime}</Text>
               </View>
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Time Remaining :</Text>
-                <Text style={styles.input}>2 Hours 27 Minutes</Text>
+                <Text style={styles.inputRed}>2 Hours 27 Minutes</Text>
               </View>
 
+              {/* Example response button */}
               <TouchableOpacity
                 style={styles.buttonResponse}
                 onPress={() => navigation.navigate("MyTaskStack")}
@@ -167,11 +148,11 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    marginTop: 50,
+    marginTop: 0,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 60,
-    paddingBottom: 55,
+    //marginBottom: 60,
+    //paddingBottom: 55,
   },
   container: {
     width: "100%",
@@ -191,11 +172,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fafafa",
+    backgroundColor: "#fff",
     //backgroundColor: "#F84F96",
     borderRadius: 10,
     paddingHorizontal: 5,
-    paddingTop: 5,
+    paddingTop: 0,
+    marginTop: 5,
   },
   formCard: {
     width: "100%",
@@ -227,6 +209,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     height: 40,
   },
+  inputRed: {
+    color: "#FF0000",
+    fontSize: 18,
+    fontWeight: "bold",
+    height: 40,
+  },
   inputArea: {
     color: "#000",
     fontSize: 18,
@@ -240,13 +228,13 @@ const styles = StyleSheet.create({
   },
   buttonResponse: {
     borderRadius: 8,
-    marginTop: 12,
+    marginTop: 20,
     marginBottom: 30,
     backgroundColor: "#FFC807",
-    padding: 10,
+    padding: 12,
   },
   textResponse: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
   },

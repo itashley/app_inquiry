@@ -14,15 +14,11 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import * as Font from "expo-font";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SplashScreen from "expo-splash-screen";
 import { Divider } from "react-native-paper";
-import { Picker } from "@react-native-picker/picker";
 
 import LOGO from "../assets/logo.png"; // Replace with your local image path
 import BACKGROUND from "../assets/bg/home.jpg"; // Replace with your background image path
-
-import MAP from "../assets/images/map-bold.png";
 
 // Prevent the splash screen from auto-hiding
 
@@ -35,31 +31,14 @@ const fetchFonts = () => {
   });
 };
 
-const feedbackOptions = ["Positive", "Negative"];
-const intentionOptions = [
-  "Business Potential",
-  "Personal Connection",
-  "Networking Opportunity",
-];
-const resultOptions = [
-  "Confirm Booking",
-  "Follow-Up Meeting",
-  "No Further Action Needed",
-];
-
 const { width, height } = Dimensions.get("window");
 
-const Detail = () => {
+const DetailOngoing = () => {
   const navigation = useNavigation();
   const [fontLoaded, setFontLoaded] = useState(false);
-  const [multiLine, setMultiLine] = useState(false);
   const route = useRoute();
 
   const { inquiry } = route.params;
-
-  const [feedback, setFeedback] = useState(feedbackOptions[0]);
-  const [intention, setIntention] = useState(intentionOptions[0]);
-  const [result, setResult] = useState(resultOptions[0]);
 
   useEffect(() => {
     const loadFont = async () => {
@@ -84,7 +63,11 @@ const Detail = () => {
         <View style={styles.container}>
           <View style={styles.formContainer}>
             <View style={styles.formCard}>
-              <Text style={styles.formTitle}>Result Inquiry Form</Text>
+              <Text style={styles.formTitle}>Guest Inquiry Form</Text>
+              <View style={styles.formGroup}>
+                <Text style={styles.label}>Messanger :</Text>
+                <Text style={styles.input}>{inquiry.messenger}</Text>
+              </View>
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Date :</Text>
                 <Text style={styles.input}>{inquiry.date}</Text>
@@ -107,26 +90,7 @@ const Detail = () => {
 
               <View style={styles.formGroup}>
                 <Text style={styles.label}>Subject :</Text>
-                <Text
-                  style={[
-                    styles.input,
-                    multiLine ? styles.inputContainer : null,
-                  ]}
-                  onTextLayout={(event) => {
-                    const { lines } = event.nativeEvent;
-                    console.log("lines : ", lines);
-                    if (lines.length > 1) {
-                      console.log("Text has multiple lines");
-                      console.log("lines length : ", lines.length);
-                      setMultiLine(true);
-                    } else {
-                      console.log("Text has single line");
-                      setMultiLine(false);
-                    }
-                  }}
-                >
-                  {inquiry.subject}
-                </Text>
+                <Text style={styles.input}>{inquiry.subject}</Text>
               </View>
 
               <View style={styles.formGroup}>
@@ -164,75 +128,12 @@ const Detail = () => {
                 <Text style={styles.inputRed}>2 Hours 27 Minutes</Text>
               </View>
 
-              <Divider />
-              <Divider />
-              <Divider />
-              <Divider />
-
-              <Text style={styles.formTitle2}>Follow-Up</Text>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.boldlabel}>Guest Feedback:</Text>
-                <Picker
-                  style={styles.picker}
-                  selectedValue={feedback}
-                  onValueChange={(itemValue) => setFeedback(itemValue)}
-                >
-                  {feedbackOptions.map((option, index) => (
-                    <Picker.Item key={index} label={option} value={option} />
-                  ))}
-                </Picker>
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.boldlabel}>Guest Intention:</Text>
-                <Picker
-                  style={styles.picker}
-                  selectedValue={intention}
-                  onValueChange={(itemValue) => setIntention(itemValue)}
-                >
-                  {intentionOptions.map((option, index) => (
-                    <Picker.Item key={index} label={option} value={option} />
-                  ))}
-                </Picker>
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.boldlabel}>Guest Result:</Text>
-                <Picker
-                  style={styles.picker}
-                  selectedValue={result}
-                  onValueChange={(itemValue) => setResult(itemValue)}
-                >
-                  {resultOptions.map((option, index) => (
-                    <Picker.Item key={index} label={option} value={option} />
-                  ))}
-                </Picker>
-              </View>
-
-              <View style={styles.formGroup}>
-                <Text style={styles.boldlabel}>Detail :</Text>
-                <TextInput
-                  style={[styles.inputAreaInput, styles.textAreaInput]}
-                  multiline
-                  textAlignVertical="top"
-                />
-              </View>
-
-              <View style={styles.doubleButton}>
-                <TouchableOpacity
-                  style={styles.buttonFollowUp}
-                  onPress={() => navigation.navigate("MyTaskStack")}
-                >
-                  <Text style={styles.textResponse}>Follow Up</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.buttonSubmit}
-                  onPress={() => navigation.navigate("MyTaskStack")}
-                >
-                  <Text style={styles.textResponse}>Submit</Text>
-                </TouchableOpacity>
-              </View>
+              {/* <TouchableOpacity
+                style={styles.buttonResponse}
+                onPress={() => navigation.navigate("MyTaskStack")}
+              >
+                <Text style={styles.textResponse}>Response</Text>
+              </TouchableOpacity> */}
             </View>
           </View>
         </View>
@@ -256,6 +157,7 @@ const styles = StyleSheet.create({
   },
   container: {
     width: "100%",
+
     //width: "100%",
     //alignItems: "center",
   },
@@ -282,6 +184,7 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: "#fafafa",
     padding: 20,
+    paddingBottom: 30,
     borderRadius: 10,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -295,13 +198,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
-  formTitle2: {
-    fontSize: 22,
-    fontWeight: "bold",
-    marginBottom: 25,
-    marginTop: 20,
-    textAlign: "left",
-  },
   formGroup: {
     marginBottom: 0,
   },
@@ -309,19 +205,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 5,
   },
-  boldlabel: {
-    fontSize: 16,
-    marginBottom: 5,
-    fontWeight: "bold",
-  },
   input: {
     color: "#000",
     fontSize: 18,
     fontWeight: "bold",
     height: 40,
-  },
-  inputContainer: {
-    marginBottom: 18,
   },
   inputRed: {
     color: "#FF0000",
@@ -333,62 +221,25 @@ const styles = StyleSheet.create({
     color: "#000",
     fontSize: 18,
     fontWeight: "bold",
-    height: 50,
+    height: 40,
     marginRight: 3,
-  },
-  inputAreaInput: {
-    color: "#000",
-    fontSize: 18,
-    fontWeight: "400",
-    height: 128,
-    marginRight: 3,
-    textAlign: "left",
-    padding: 10,
   },
   textArea: {
     height: 128,
     marginBottom: 18,
   },
-  textAreaInput: {
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    backgroundColor: "#f5f5f5",
-    height: 120,
-  },
-  doubleButton: {
-    marginTop: 25,
-    marginBottom: 30,
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  buttonFollowUp: {
+  buttonResponse: {
     borderRadius: 8,
+    marginTop: 20,
+    marginBottom: 30,
     backgroundColor: "#FFC807",
     padding: 12,
-    width: "45%",
-  },
-  buttonSubmit: {
-    borderRadius: 8,
-    backgroundColor: "#00E833",
-    padding: 12,
-    width: "45%",
   },
   textResponse: {
     fontSize: 16,
     fontWeight: "bold",
     textAlign: "center",
   },
-  picker: {
-    height: 30,
-    color: "#000", // Text color
-    backgroundColor: "#f0f0f0", // Background color
-
-    fontSize: 18, // Font size
-    marginBottom: 30,
-  },
 });
 
-export default Detail;
+export default DetailOngoing;
